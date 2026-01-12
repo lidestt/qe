@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeetApp — Знакомства</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <!-- Экран загрузки -->
+    <div id="loadingScreen" class="screen active">
+        <div class="loading-content">
+            <div class="loader"></div>
+            <h1>MeetApp</h1>
+            <p>Загрузка приложения...</p>
+        </div>
+    </div>
+
+    <!-- Экран правил -->
+    <div id="rulesScreen" class="screen">
+        <div class="rules-content">
+            <h2>Правила</h2>
+            <div class="rules-list">
+                <div class="rule-item">
+                    <i class="fas fa-camera"></i>
+                    <p>Используйте <strong>свои реальные фото</strong>. Минимум 50% лица должно быть видно!</p>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-user"></i>
+                    <p>Указывайте <strong>своё настоящее имя</strong> или нормальный никнейм.</p>
+                </div>
+                <div class="rule-item">
+                    <i class="fas fa-heart"></i>
+                    <p>Уважайте других пользователей. Оскорбления и спам запрещены.</p>
+                </div>
+            </div>
+            <button id="acceptRules" class="btn-primary">Я понял(а)</button>
+        </div>
+    </div>
+
+    <!-- Регистрация - Шаг 1 -->
+    <div id="regStep1" class="screen">
+        <div class="reg-header">
+            <h2>Регистрация • Шаг 1 из 3</h2>
+        </div>
+        <div class="reg-content">
+            <div class="input-group">
+                <label for="regName">Имя</label>
+                <input type="text" id="regName" placeholder="Как к тебе обращаться?" maxlength="20">
+                <div class="input-hint">До 20 символов</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="regAge">Возраст</label>
+                <input type="number" id="regAge" placeholder="Введите цифры" min="18" max="100">
+            </div>
+            
+            <div class="input-group">
+                <label>Пол</label>
+                <div class="gender-buttons">
+                    <button class="gender-btn" data-gender="male">👨 Парень</button>
+                    <button class="gender-btn" data-gender="female">👩 Девушка</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Кого показывать в ленте?</label>
+                <div class="show-gender-buttons">
+                    <button class="show-gender-btn" data-show="male">Парней</button>
+                    <button class="show-gender-btn" data-show="female">Девушек</button>
+                    <button class="show-gender-btn" data-show="all">Всех</button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="regCountry">Страна</label>
+                <select id="regCountry">
+                    <option value="">Выберите страну</option>
+                    <option value="Россия">Россия</option>
+                    <option value="Беларусь">Беларусь</option>
+                    <option value="Украина">Украина</option>
+                    <option value="Казахстан">Казахстан</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="regCity">Город</label>
+                <input type="text" id="regCity" placeholder="Сначала выберите страну">
+            </div>
+            
+            <button id="nextStep1" class="btn-primary" disabled>Продолжить</button>
+            <div class="reg-hint">Заполните все поля • это займёт ~1 минуту</div>
+        </div>
+    </div>
+
+    <!-- Регистрация - Шаг 2 -->
+    <div id="regStep2" class="screen">
+        <div class="reg-header">
+            <h2>Регистрация • Шаг 2 из 3</h2>
+        </div>
+        <div class="reg-content">
+            <!-- Контент для шага 2 (рост, вес, интересы) -->
+            <div class="step-content">
+                <p>Здесь будут поля для роста, веса, выбора целей знакомства и интересов</p>
+                <button id="nextStep2" class="btn-primary">Далее</button>
+                <button id="backStep1" class="btn-secondary">Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главный интерфейс приложения -->
+    <div id="mainApp" class="screen">
+        <!-- Верхняя панель -->
+        <header class="app-header">
+            <div class="header-left">
+                <button id="menuBtn" class="icon-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="app-title">MeetApp</span>
+            </div>
+            <div class="header-right">
+                <button id="premiumBtn" class="premium-btn">
+                    <i class="fas fa-crown"></i>
+                    <span>Премиум</span>
+                </button>
+                <div class="swipe-counter">
+                    <i class="fas fa-fire"></i>
+                    <span id="swipeCount">60</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="app-main">
+            <!-- Карточка профиля -->
+            <div id="profileCard" class="profile-card">
+                <div class="card-photos">
+                    <!-- Фотографии будут добавляться динамически -->
+                    <div class="photo-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="card-info">
+                    <div class="profile-header">
+                        <h2 id="profileName">Имя, Возраст</h2>
+                        <div class="profile-badges">
+                            <span class="badge premium" id="premiumBadge">PREMIUM</span>
+                            <span class="badge" id="zodiacBadge">♋ Рак</span>
+                            <span class="badge" id="mbtiBadge">INTJ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="profileLocation">Город, Страна</span>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="profileHeight">180</span>
+                            <span class="stat-label">см</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="profileWeight">63</span>
+                            <span class="stat-label">кг</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="profileIncome">—</span>
+                            <span class="stat-label">в месяц</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-subculture">
+                        <span id="profileSubculture">Нормис</span>
+                        <span class="divider">•</span>
+                        <span id="profileGoal">Дружба</span>
+                    </div>
+                    
+                    <div class="profile-bio">
+                        <p id="profileBio">Описание пользователя будет здесь...</p>
+                    </div>
+                    
+                    <div class="profile-interests" id="interestsContainer">
+                        <!-- Интересы будут добавляться динамически -->
+                    </div>
+                </div>
+                
+                <div class="card-actions">
+                    <button id="dislikeBtn" class="action-btn dislike">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button id="superLikeBtn" class="action-btn superlike">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button id="likeBtn" class="action-btn like">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Уведомление о мэтче -->
+            <div id="matchNotification" class="match-notification">
+                <div class="match-content">
+                    <div class="match-heart">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Это взаимная симпатия!</h3>
+                    <p id="matchName">Вы понравились Имя</p>
+                    <button id="sendMessageBtn" class="btn-primary">Написать сообщение</button>
+                    <button id="continueBtn" class="btn-secondary">Продолжить просмотр</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Нижняя навигация -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-section="feed">
+                <i class="fas fa-fire"></i>
+                <span>Лента</span>
+            </button>
+            <button class="nav-btn" data-section="likes">
+                <i class="fas fa-heart"></i>
+                <span>Лайки</span>
+                <span class="nav-badge" id="likesBadge">0</span>
+            </button>
+            <button class="nav-btn" data-section="matches">
+                <i class="fas fa-comments"></i>
+                <span>Мэтчи</span>
+                <span class="nav-badge" id="matchesBadge">0</span>
+            </button>
+            <button class="nav-btn" data-section="profile">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+
+        <!-- Боковое меню -->
+        <div id="sideMenu" class="side-menu">
+            <div class="menu-header">
+                <h3>Меню</h3>
+                <button id="closeMenu" class="icon-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="menu-content">
+                <a href="#" class="menu-item" data-action="myProfile">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Мой профиль</span>
+                </a>
+                <a href="#" class="menu-item" data-action="editProfile">
+                    <i class="fas fa-edit"></i>
+                    <span>Редактировать анкету</span>
+                </a>
+                <a href="#" class="menu-item" data-action="visitors">
+                    <i class="fas fa-eye"></i>
+                    <span>Посетители моей анкеты</span>
+                    <span class="menu-badge" id="visitorsBadge">0</span>
+                </a>
+                <a href="#" class="menu-item" data-action="filters">
+                    <i class="fas fa-filter"></i>
+                    <span>Фильтры</span>
+                </a>
+                <a href="#" class="menu-item" data-action="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+                <a href="#" class="menu-item premium-item" data-action="buyPremium">
+                    <i class="fas fa-crown"></i>
+                    <span>Купить Премиум</span>
+                </a>
+                <div class="menu-divider"></div>
+                <a href="#" class="menu-item logout" data-action="logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран профиля -->
+    <div id="profileScreen" class="screen">
+        <div class="profile-screen">
+            <button id="backToMain" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Назад
+            </button>
+            
+            <div class="profile-header-large">
+                <div class="profile-avatar">
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <button class="avatar-edit">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <h2 id="myProfileName">Имя, Возраст</h2>
+                <p id="myProfileLocation">Город, Страна</p>
+            </div>
+            
+            <div class="profile-stats-large">
+                <div class="stat-item">
+                    <span class="stat-number" id="myLikesCount">0</span>
+                    <span class="stat-label">Лайков</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="myVisitsCount">0</span>
+                    <span class="stat-label">Просмотров</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="myMatchesCount">0</span>
+                    <span class="stat-label">Мэтчей</span>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <!-- Детали профиля будут заполняться динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+    
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редактировать профиль</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Форма редактирования -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="api.js"></script>
+</body>
+</html>
