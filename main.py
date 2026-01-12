@@ -14,7 +14,7 @@ app = FastAPI(title="Dating WebApp API", version="1.0")
 # CORS для фронтенда
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В продакшене заменить на домен фронтенда
+    allow_origins=["https://qe-nine.vercel.app/"],  # В продакшене заменить на домен фронтенда
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

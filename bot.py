@@ -14,7 +14,7 @@ async def cmd_start(message: types.Message):
     builder = InlineKeyboardBuilder()
     builder.button(
         text="📱 Открыть приложение",
-        web_app=WebAppInfo(url="https://ВАШ_ДОМЕН.github.io/frontend/")
+        web_app=WebAppInfo(url="https://qe-nine.vercel.app/")
     )
     
     await message.answer(
@@ -28,7 +28,7 @@ async def cmd_app(message: types.Message):
     builder = InlineKeyboardBuilder()
     builder.button(
         text="✨ Открыть MeetApp",
-        web_app=WebAppInfo(url="https://ВАШ_ДОМЕН.github.io/frontend/")
+        web_app=WebAppInfo(url="7643166704:AAEJU--qZz0D9u-cCA0eKnPJbzQIW2wrZKM")
     )
     
     await message.answer(
